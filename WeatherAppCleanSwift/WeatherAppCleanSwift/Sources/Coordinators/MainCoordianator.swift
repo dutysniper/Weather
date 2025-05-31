@@ -27,8 +27,7 @@ final class MainCoordinator: BaseCoordinator {
 	}
 
 	func showMainScreen() {
-		let viewController = MainScreenViewController()
-		navigationController.pushViewController(viewController, animated: true)
+		navigationController.pushViewController(MainScreenAssembler.assembleModule(), animated: true)
 	}
 }
 

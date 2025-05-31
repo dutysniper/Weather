@@ -23,6 +23,7 @@
 		91D57D972DEA5783001DEBAF /* MainScreenModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D962DEA5783001DEBAF /* MainScreenModel.swift */; };
 		91D57D992DEA578F001DEBAF /* MainScreenAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D982DEA578F001DEBAF /* MainScreenAssembler.swift */; };
 		91D57D9C2DEA623E001DEBAF /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D9B2DEA623E001DEBAF /* NetworkManager.swift */; };
+		91D57D9E2DEB1A40001DEBAF /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D9D2DEB1A40001DEBAF /* LocationService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,7 @@
 		91D57D962DEA5783001DEBAF /* MainScreenModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenModel.swift; sourceTree = "<group>"; };
 		91D57D982DEA578F001DEBAF /* MainScreenAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenAssembler.swift; sourceTree = "<group>"; };
 		91D57D9B2DEA623E001DEBAF /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		91D57D9D2DEB1A40001DEBAF /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,6 +202,7 @@
 			isa = PBXGroup;
 			children = (
 				91D57D9B2DEA623E001DEBAF /* NetworkManager.swift */,
+				91D57D9D2DEB1A40001DEBAF /* LocationService.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -342,6 +345,7 @@
 				91D57D8A2DEA4742001DEBAF /* AppCoordinator.swift in Sources */,
 				91D57D5B2DEA3CB0001DEBAF /* MainScreenViewController.swift in Sources */,
 				91D57D8C2DEA4768001DEBAF /* MainCoordianator.swift in Sources */,
+				91D57D9E2DEB1A40001DEBAF /* LocationService.swift in Sources */,
 				91D57D572DEA3CB0001DEBAF /* AppDelegate.swift in Sources */,
 				91D57D592DEA3CB0001DEBAF /* SceneDelegate.swift in Sources */,
 				91D57D972DEA5783001DEBAF /* MainScreenModel.swift in Sources */,
@@ -522,6 +526,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeatherAppCleanSwift/Resourcers/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Приложению нужен постоянный доступ для обновления погоды в фоновом режиме";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Приложению нужен доступ к вашей локации для показа актуальной погоды";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -555,6 +561,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WeatherAppCleanSwift/Resourcers/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Приложению нужен постоянный доступ для обновления погоды в фоновом режиме";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Приложению нужен доступ к вашей локации для показа актуальной погоды";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
