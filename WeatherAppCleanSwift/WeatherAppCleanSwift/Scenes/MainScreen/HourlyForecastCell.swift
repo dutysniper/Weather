@@ -16,6 +16,7 @@ final class HourlyForecastCell: UICollectionViewCell {
 
 		label.font = .systemFont(ofSize: 14, weight: .medium)
 		label.textAlignment = .center
+		label.textColor = .white
 
 		return label
 	}()
@@ -23,7 +24,8 @@ final class HourlyForecastCell: UICollectionViewCell {
 	private let iconImageView: UIImageView = {
 		let imageView = UIImageView()
 
-		imageView.contentMode = .scaleToFill
+		imageView.clipsToBounds = true
+		imageView.contentMode = .scaleAspectFit
 
 		return imageView
 	}()
@@ -33,6 +35,7 @@ final class HourlyForecastCell: UICollectionViewCell {
 
 		label.font = .systemFont(ofSize: 16, weight: .bold)
 		label.textAlignment = .center
+		label.textColor = .white
 
 		return label
 	}()
@@ -66,22 +69,29 @@ final class HourlyForecastCell: UICollectionViewCell {
 	}
 
 	private func setupViews() {
-		let stackView = UIStackView(arrangedSubviews: [timeLabel, iconImageView, temperatureLabel])
-		stackView.axis = .vertical
-		stackView.spacing = 4
-		stackView.alignment = .center
+		contentView.addSubview(timeLabel)
+		contentView.addSubview(iconImageView)
+		contentView.addSubview(temperatureLabel)
 
-		contentView.addSubview(stackView)
-		stackView.translatesAutoresizingMaskIntoConstraints = false
-
+		timeLabel.translatesAutoresizingMaskIntoConstraints = false
+		iconImageView.translatesAutoresizingMaskIntoConstraints = false
+		temperatureLabel.translatesAutoresizingMaskIntoConstraints = false
+		
 		NSLayoutConstraint.activate([
-			stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
-			stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-			stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-			stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+			timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
+			timeLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
+			timeLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4),
+			timeLabel.heightAnchor.constraint(equalToConstant: 16),
 
+			iconImageView.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 2),
+			iconImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
 			iconImageView.widthAnchor.constraint(equalToConstant: 30),
-			iconImageView.heightAnchor.constraint(equalToConstant: 30)
+			iconImageView.heightAnchor.constraint(equalToConstant: 30),
+
+			temperatureLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 2),
+			temperatureLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
+			temperatureLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4),
+			temperatureLabel.heightAnchor.constraint(equalToConstant: 18)
 		])
 	}
 }

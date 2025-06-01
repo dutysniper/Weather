@@ -14,7 +14,6 @@
 		91D57D632DEA3CB3001DEBAF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 91D57D622DEA3CB3001DEBAF /* Base */; };
 		91D57D6E2DEA3CB3001DEBAF /* WeatherAppCleanSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D6D2DEA3CB3001DEBAF /* WeatherAppCleanSwiftTests.swift */; };
 		91D57D782DEA3CB3001DEBAF /* WeatherAppCleanSwiftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D772DEA3CB3001DEBAF /* WeatherAppCleanSwiftUITests.swift */; };
-		91D57D7A2DEA3CB3001DEBAF /* WeatherAppCleanSwiftUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D792DEA3CB3001DEBAF /* WeatherAppCleanSwiftUITestsLaunchTests.swift */; };
 		91D57D8A2DEA4742001DEBAF /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D892DEA4742001DEBAF /* AppCoordinator.swift */; };
 		91D57D8C2DEA4768001DEBAF /* MainCoordianator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D8B2DEA4768001DEBAF /* MainCoordianator.swift */; };
 		91D57D8F2DEA47C0001DEBAF /* ICoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D8E2DEA47C0001DEBAF /* ICoordinator.swift */; };
@@ -26,6 +25,8 @@
 		91D57D9E2DEB1A40001DEBAF /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D9D2DEB1A40001DEBAF /* LocationService.swift */; };
 		91D57DA02DEC627B001DEBAF /* HourlyForecastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D9F2DEC627B001DEBAF /* HourlyForecastCell.swift */; };
 		91D57DA42DEC66E1001DEBAF /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 91D57DA32DEC66E1001DEBAF /* Kingfisher */; };
+		91D57DA62DEC8B64001DEBAF /* WeatherAppCleanSwiftUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57D792DEA3CB3001DEBAF /* WeatherAppCleanSwiftUITestsLaunchTests.swift */; };
+		91D57DA82DEC9A06001DEBAF /* DailyForecastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D57DA72DEC9A06001DEBAF /* DailyForecastCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +69,7 @@
 		91D57D9B2DEA623E001DEBAF /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		91D57D9D2DEB1A40001DEBAF /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		91D57D9F2DEC627B001DEBAF /* HourlyForecastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyForecastCell.swift; sourceTree = "<group>"; };
+		91D57DA72DEC9A06001DEBAF /* DailyForecastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyForecastCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,8 +140,8 @@
 		91D57D762DEA3CB3001DEBAF /* WeatherAppCleanSwiftUITests */ = {
 			isa = PBXGroup;
 			children = (
-				91D57D772DEA3CB3001DEBAF /* WeatherAppCleanSwiftUITests.swift */,
 				91D57D792DEA3CB3001DEBAF /* WeatherAppCleanSwiftUITestsLaunchTests.swift */,
+				91D57D772DEA3CB3001DEBAF /* WeatherAppCleanSwiftUITests.swift */,
 			);
 			path = WeatherAppCleanSwiftUITests;
 			sourceTree = "<group>";
@@ -200,6 +202,7 @@
 				91D57D962DEA5783001DEBAF /* MainScreenModel.swift */,
 				91D57D982DEA578F001DEBAF /* MainScreenAssembler.swift */,
 				91D57D9F2DEC627B001DEBAF /* HourlyForecastCell.swift */,
+				91D57DA72DEC9A06001DEBAF /* DailyForecastCell.swift */,
 			);
 			path = MainScreen;
 			sourceTree = "<group>";
@@ -362,6 +365,7 @@
 				91D57D992DEA578F001DEBAF /* MainScreenAssembler.swift in Sources */,
 				91D57D9C2DEA623E001DEBAF /* NetworkManager.swift in Sources */,
 				91D57D8A2DEA4742001DEBAF /* AppCoordinator.swift in Sources */,
+				91D57DA82DEC9A06001DEBAF /* DailyForecastCell.swift in Sources */,
 				91D57D5B2DEA3CB0001DEBAF /* MainScreenViewController.swift in Sources */,
 				91D57D8C2DEA4768001DEBAF /* MainCoordianator.swift in Sources */,
 				91D57D9E2DEB1A40001DEBAF /* LocationService.swift in Sources */,
@@ -385,7 +389,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				91D57D782DEA3CB3001DEBAF /* WeatherAppCleanSwiftUITests.swift in Sources */,
-				91D57D7A2DEA3CB3001DEBAF /* WeatherAppCleanSwiftUITestsLaunchTests.swift in Sources */,
+				91D57DA62DEC8B64001DEBAF /* WeatherAppCleanSwiftUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

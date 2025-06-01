@@ -21,13 +21,13 @@ final class NetworkManager {
 			completion(.failure(NetworkError.invalidCityName))
 			return
 		}
-		let urlString = "\(baseUrl)/forecast.json?key=\(apiKey)&q=\(encodedCity)&days=1&aqi=no&lang=ru"
+		let urlString = "\(baseUrl)/forecast.json?key=\(apiKey)&q=\(encodedCity)&days=5&aqi=no&lang=ru"
 
 		performRequest(urlString: urlString, completion: completion)
 	}
 
 	func fetchWeather(latitude: Double, longitude: Double, completion: @escaping (Result<WeatherResponse, Error>) -> Void) {
-		performRequest(urlString: "\(baseUrl)/forecast.json?key=\(apiKey)&q=\(latitude),\(longitude)&aqi=no&lang=ru", completion: completion)
+		performRequest(urlString: "\(baseUrl)/forecast.json?key=\(apiKey)&q=\(latitude),\(longitude)&days=5&aqi=no&lang=ru", completion: completion)
 	}
 
 	private func performRequest(urlString: String, completion: @escaping (Result<WeatherResponse, Error>) -> Void) {

@@ -19,7 +19,23 @@ struct Forecast: Codable {
 }
 
 struct ForecastDay: Codable {
+	let date: String
+	let date_epoch: TimeInterval
+	let day: DayForecast
 	let hour: [HourlyForecast]
+}
+
+struct DayForecast: Codable {
+//	let maxtemp_c: Double
+//	let mintemp_c: Double
+	let avgtemp_c: Double
+	let maxwind_kph: Double
+	let avghumidity: Double
+	let condition: WeatherCondition
+
+	enum CodingKeys: String, CodingKey {
+		case avgtemp_c, maxwind_kph, avghumidity, condition
+	}
 }
 
 struct HourlyForecast: Codable {
@@ -86,6 +102,7 @@ enum Weather {
 			let windSpeed: String
 			let iconURL: URL?
 			let hourlyForecast: [HourlyForecast]
+			let dailyForecast: [ForecastDay]
 		}
 	}
 

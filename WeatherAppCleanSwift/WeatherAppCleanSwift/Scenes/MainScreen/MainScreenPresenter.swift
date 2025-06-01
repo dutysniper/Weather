@@ -23,6 +23,7 @@ final class MainScreenPresenter: IMainScreenPresenter {
 		let weather = response.weatherData.current
 		let location = response.weatherData.location
 		let hourlyForecast = response.weatherData.forecast?.forecastday.first?.hour ?? []
+		let dailyForecast = response.weatherData.forecast?.forecastday ?? []
 
 		let viewModel = Weather.Fetch.ViewModel(
 			cityName: "\(location.name), \(location.country)",
@@ -30,9 +31,10 @@ final class MainScreenPresenter: IMainScreenPresenter {
 			condition: weather.condition.text,
 			feelsLike: "Ощущается как \(Int(weather.feelslikeC))°C",
 			humidity: "Влажность: \(weather.humidity)%",
-			windSpeed: "Ветер: \(weather.windKph) km/h",
+			windSpeed: "Ветер: \(weather.windKph) км/ч",
 			iconURL: URL(string: "https:\(weather.condition.icon)"),
-			hourlyForecast: filterHourlyForecast(hourlyForecast)
+			hourlyForecast: filterHourlyForecast(hourlyForecast),
+			dailyForecast: Array(dailyForecast.prefix(5))
 		)
 
 		viewController?.displayWeather(viewModel: viewModel)
