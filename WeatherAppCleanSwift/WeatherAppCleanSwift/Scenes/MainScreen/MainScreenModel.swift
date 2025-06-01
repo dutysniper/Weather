@@ -11,6 +11,22 @@ import CoreLocation
 struct WeatherResponse: Codable {
 	let location: Location
 	let current: CurrentWeather
+	let forecast: Forecast?
+}
+
+struct Forecast: Codable {
+	let forecastday: [ForecastDay]
+}
+
+struct ForecastDay: Codable {
+	let hour: [HourlyForecast]
+}
+
+struct HourlyForecast: Codable {
+	let time: String
+	let temp_c: Double
+	let condition: WeatherCondition
+	let time_epoch: TimeInterval
 }
 
 struct Location: Codable {
@@ -69,6 +85,7 @@ enum Weather {
 			let humidity: String
 			let windSpeed: String
 			let iconURL: URL?
+			let hourlyForecast: [HourlyForecast]
 		}
 	}
 
