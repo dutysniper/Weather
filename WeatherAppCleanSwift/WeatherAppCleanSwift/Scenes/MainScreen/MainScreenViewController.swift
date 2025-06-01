@@ -47,7 +47,7 @@ final class MainScreenViewController: UIViewController {
 	private lazy var dailyForecastCollectionView: UICollectionView = {
 		let layout = UICollectionViewFlowLayout()
 		layout.scrollDirection = .vertical
-		layout.minimumLineSpacing = 8
+		layout.minimumLineSpacing = 4
 		layout.itemSize = CGSize(width: view.frame.width - 20, height: 60)
 
 		let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -138,7 +138,8 @@ extension MainScreenViewController: UICollectionViewDataSource, UICollectionView
 				for: indexPath) as? HourlyForecastCell else {
 				return UICollectionViewCell()
 			}
-			cell.configure(with: hourlyForecast[indexPath.row])
+			let isCurrentHour = indexPath.row == 0
+			cell.configure(with: hourlyForecast[indexPath.row], isCurrentHour: isCurrentHour)
 			return cell
 		} else {
 			guard let cell = collectionView.dequeueReusableCell(
@@ -146,7 +147,8 @@ extension MainScreenViewController: UICollectionViewDataSource, UICollectionView
 				for: indexPath) as? DailyForecastCell else {
 				return UICollectionViewCell()
 			}
-			cell.configure(with: dailyForecast[indexPath.row])
+			let isToday = indexPath.row == 0
+			cell.configure(with: dailyForecast[indexPath.row], isToday: isToday)
 			return cell
 		}
 	}
@@ -159,7 +161,6 @@ extension MainScreenViewController: UICollectionViewDataSource, UICollectionView
 		}
 	}
 }
-
 
 //MARK: - Setup UI
 private extension MainScreenViewController {

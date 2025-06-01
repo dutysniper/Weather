@@ -49,8 +49,12 @@ final class HourlyForecastCell: UICollectionViewCell {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	func configure(with forecast: HourlyForecast) {
-		timeLabel.text = formatTime(forecast.time)
+	func configure(with forecast: HourlyForecast, isCurrentHour: Bool = false) {
+		if isCurrentHour {
+			timeLabel.text = "Сейчас"
+		} else {
+			timeLabel.text = formatTime(forecast.time)
+		}
 		temperatureLabel.text = "\(Int(forecast.temp_c))°"
 
 		if let iconUrl = URL(string: "https:\(forecast.condition.icon)") {
@@ -76,7 +80,7 @@ final class HourlyForecastCell: UICollectionViewCell {
 		timeLabel.translatesAutoresizingMaskIntoConstraints = false
 		iconImageView.translatesAutoresizingMaskIntoConstraints = false
 		temperatureLabel.translatesAutoresizingMaskIntoConstraints = false
-		
+
 		NSLayoutConstraint.activate([
 			timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
 			timeLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),

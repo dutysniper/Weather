@@ -8,6 +8,12 @@
 import UIKit
 
 final class DailyForecastCell: UICollectionViewCell {
+	let separator: UIView = {
+		let view = UIView()
+		view.backgroundColor = .white.withAlphaComponent(0.2)
+		return view
+	}()
+
 	static let identifier = "DailyForecastCell"
 
 	private let dayLabel: UILabel = {
@@ -61,8 +67,12 @@ final class DailyForecastCell: UICollectionViewCell {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	func configure(with forecast: ForecastDay) {
-		dayLabel.text = formatDay(forecast.date)
+	func configure(with forecast: ForecastDay, isToday: Bool = false) {
+		if isToday {
+			dayLabel.text = "Сегодня"
+		} else {
+			dayLabel.text = formatDay(forecast.date)
+		}
 		tempLabel.text = "\(Int(forecast.day.avgtemp_c))°"
 		windLabel.text = "Ветер: \(Int(forecast.day.maxwind_kph))км/ч"
 		humidityLabel.text = "Влажность: \(forecast.day.avghumidity)%"
@@ -99,13 +109,21 @@ final class DailyForecastCell: UICollectionViewCell {
 		contentView.addSubview(mainStack)
 		mainStack.translatesAutoresizingMaskIntoConstraints = false
 
+		contentView.addSubview(separator)
+		separator.translatesAutoresizingMaskIntoConstraints = false
+
 		NSLayoutConstraint.activate([
+			separator.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+			separator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+			separator.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+			separator.heightAnchor.constraint(equalToConstant: 0.5),
+
 			mainStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
 			mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
 			mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
 			mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
 
-			dayLabel.widthAnchor.constraint(equalToConstant: 40),
+			dayLabel.widthAnchor.constraint(equalToConstant: 60),
 			iconImageView.widthAnchor.constraint(equalToConstant: 30),
 			iconImageView.heightAnchor.constraint(equalToConstant: 30),
 			tempLabel.widthAnchor.constraint(equalToConstant: 40)
