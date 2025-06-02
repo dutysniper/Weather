@@ -9,6 +9,8 @@ import Foundation
 
 protocol IMainScreenInteractor {
 	func fetchWeather()
+	func fetchWeather(for city: String)
+	func searchCities(query: String)
 }
 
 final class MainScreenInteractor: IMainScreenInteractor {
@@ -28,19 +30,56 @@ final class MainScreenInteractor: IMainScreenInteractor {
 	}
 
 	func fetchWeather() {
-		switch locationService.authorizationStatus {
+		checkLocationAuthorization()
+	}
+
+	private func checkLocationAuthorization() {
+		let status = locationService.authorizationStatus
+
+		switch status {
 		case .notDetermined:
-			// Если статус не определён, запрашиваем локацию
-			// (пользователь увидит системный алерт)
-			fetchWeatherByLocation()
+			requestLocation()
+		case .authorizedWhenInUse, .authorizedAlways:
+			requestLocation()
 		case .denied, .restricted:
-			// Если доступ запрещён - сразу показываем дефолтный город
-			fetchWeather(for: "Paris")
-		case .authorizedAlways, .authorizedWhenInUse:
-			// Если доступ разрешён - запрашиваем локацию
-			fetchWeatherByLocation()
+			presenter.showSearchOnly()
 		@unknown default:
-			fetchWeather(for: "Paris")
+			presenter.showSearchOnly()
+		}
+	}
+
+	private func requestLocation() {
+		locationService.requestLocation { [weak self] result in
+			switch result {
+			case .success(let coordinates):
+				self?.fetchWeather(latitude: coordinates.latitude, longitude: coordinates.longitude)
+			case .failure:
+				self?.presenter.showSearchOnly()
+			}
+		}
+	}
+
+	func fetchWeather(for city: String) {
+		networkManager.fetchWeather(for: city) { [weak self] result in
+			switch result {
+			case .success(let response):
+				self?.presenter.presentWeather(response: Weather.Fetch.Response(weatherData: response))
+			case .failure(let error):
+				self?.presenter.presentError(error: error)
+			}
+		}
+	}
+
+	func searchCities(query: String) {
+		networkManager.fetchAutocompleteCities(query: query) { [weak self] result in
+			DispatchQueue.main.async {
+				switch result {
+				case .success(let cities):
+					self?.presenter.updateSearchResults(cities: cities)
+				case .failure:
+					self?.presenter.updateSearchResults(cities: [])
+				}
+			}
 		}
 	}
 
@@ -49,21 +88,10 @@ final class MainScreenInteractor: IMainScreenInteractor {
 			switch result {
 			case .success(let coordinates):
 				self?.fetchWeather(latitude: coordinates.latitude, longitude: coordinates.longitude)
+				self?.presenter.hideSearchField()
 			case .failure:
-				// Fallback to default city
+				self?.presenter.showSearchField()
 				self?.fetchWeather(for: "Paris")
-			}
-		}
-	}
-
-	private func fetchWeather(for city: String) {
-		print("fetch weather for paris")
-		networkManager.fetchWeather(for: city) { [weak self] result in
-			switch result {
-			case .success(let response):
-				self?.presenter.presentWeather(response: Weather.Fetch.Response(weatherData: response))
-			case .failure(let error):
-				self?.presenter.presentError(error: error)
 			}
 		}
 	}

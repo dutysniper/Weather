@@ -11,6 +11,8 @@ protocol IMainScreenAssembler {
 	static func assembleModule() -> UIViewController
 }
 
+/// Module confugurator
+/// Inject dependecies
 final class MainScreenAssembler: IMainScreenAssembler {
 	static func assembleModule() -> UIViewController {
 		let networkManager = NetworkManager()

@@ -11,6 +11,10 @@ import UIKit
 protocol IMainScreenViewController: AnyObject {
 	func displayWeather(viewModel: Weather.Fetch.ViewModel)
 	func displayError(viewModel: Weather.Error.ViewModel)
+	func showSearchField()
+	func hideSearchField()
+	func updateSearchResults(cities: [City])
+	func displaySearchOnlyState()
 }
 
 final class MainScreenViewController: UIViewController {
@@ -26,6 +30,39 @@ final class MainScreenViewController: UIViewController {
 	private let feelsLikeLabel = UILabel()
 	private let humidityLabel = UILabel()
 	private let windLabel = UILabel()
+
+	private lazy var searchBar: UISearchBar = {
+		let searchBar = UISearchBar()
+		searchBar.placeholder = "Поиск города"
+		searchBar.delegate = self
+		searchBar.searchBarStyle = .minimal
+		searchBar.barTintColor = .white
+		searchBar.tintColor = .white
+		if let textField = searchBar.value(forKey: "searchField") as? UITextField {
+			textField.textColor = .white
+			textField.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+			textField.attributedPlaceholder = NSAttributedString(
+				string: "Поиск города",
+				attributes: [.foregroundColor: UIColor.lightText]
+			)
+		}
+		searchBar.translatesAutoresizingMaskIntoConstraints = false
+		return searchBar
+	}()
+
+	private lazy var searchTableView: UITableView = {
+		let tableView = UITableView()
+		tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cityCell")
+		tableView.backgroundColor = UIColor(named: "DarkPurple")?.withAlphaComponent(0.7)
+		tableView.layer.cornerRadius = 10
+		tableView.isHidden = true
+		tableView.delegate = self
+		tableView.dataSource = self
+		tableView.isUserInteractionEnabled = true
+		tableView.allowsSelection = true
+		tableView.translatesAutoresizingMaskIntoConstraints = false
+		return tableView
+	}()
 
 	private lazy var hourlyForecastCollectionView: UICollectionView = {
 		let layout = UICollectionViewFlowLayout()
@@ -62,7 +99,7 @@ final class MainScreenViewController: UIViewController {
 
 	private var hourlyForecast: [HourlyForecast] = []
 	private var dailyForecast: [ForecastDay] = []
-
+	private var searchResults: [City] = []
 
 	// MARK: - Initialization
 
@@ -86,8 +123,6 @@ final class MainScreenViewController: UIViewController {
 	private func fetchWeather() {
 		interactor?.fetchWeather()
 	}
-
-
 }
 
 //MARK: - IMainScreenViewController
@@ -109,16 +144,62 @@ extension MainScreenViewController: IMainScreenViewController {
 		}
 	}
 
+	func displaySearchOnlyState() {
+		cityLabel.text = "Поиск города"
+		tempLabel.text = ""
+		conditionLabel.text = ""
+		feelsLikeLabel.text = ""
+		humidityLabel.text = ""
+		windLabel.text = ""
+
+		hourlyForecast = []
+		dailyForecast = []
+		hourlyForecastCollectionView.reloadData()
+		dailyForecastCollectionView.reloadData()
+		self.hourlyForecastCollectionView.isHidden = true
+		self.dailyForecastCollectionView.isHidden = true
+
+		searchBar.isHidden = false
+		searchBar.isUserInteractionEnabled = true
+		view.bringSubviewToFront(searchBar)
+	}
+
+	func updateSearchResults(cities: [City]) {
+		searchResults = cities
+		searchTableView.reloadData()
+		searchTableView.isHidden = cities.isEmpty
+	}
+
 	func displayError(viewModel: Weather.Error.ViewModel) {
 		let alert = UIAlertController(title: viewModel.title, message: viewModel.message, preferredStyle: .alert)
 		alert.addAction(UIAlertAction(title: "OK", style: .default))
 		present(alert, animated: true)
 	}
+
+	func showSearchField() {
+		DispatchQueue.main.async { [weak self] in
+			self?.searchBar.isHidden = false
+			self?.searchTableView.isHidden = true
+			UIView.animate(withDuration: 0.3) {
+				self?.view.layoutIfNeeded()
+			}
+		}
+	}
+
+	func hideSearchField() {
+		DispatchQueue.main.async { [weak self] in
+			self?.searchBar.isHidden = true
+			self?.searchTableView.isHidden = true
+			UIView.animate(withDuration: 0.3) {
+				self?.view.layoutIfNeeded()
+			}
+		}
+	}
+	
 }
 
 //MARK: - UICollectionViewDataSource, UICollectionViewDelegate
 extension MainScreenViewController: UICollectionViewDataSource, UICollectionViewDelegate {
-
 	func numberOfSections(in collectionView: UICollectionView) -> Int {
 		return 1
 	}
@@ -152,13 +233,62 @@ extension MainScreenViewController: UICollectionViewDataSource, UICollectionView
 			return cell
 		}
 	}
+}
 
-	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-		if collectionView == hourlyForecastCollectionView {
-			return CGSize(width: 80, height: 100)
-		} else {
-			return CGSize(width: collectionView.frame.width - 20, height: 60)
+//MARK: - UITableViewDataSource, UITableViewDelegate
+extension MainScreenViewController: UITableViewDataSource, UITableViewDelegate {
+	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+		return searchResults.count
+	}
+
+	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "cityCell", for: indexPath)
+		let city = searchResults[indexPath.row]
+		cell.textLabel?.text = "\(city.name), \(city.country)"
+		cell.textLabel?.textColor = .white
+		cell.backgroundColor = .clear
+		return cell
+	}
+
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		tableView.deselectRow(at: indexPath, animated: true)
+		let city = searchResults[indexPath.row]
+		searchBar.text = "\(city.name), \(city.country)"
+		searchBar.resignFirstResponder()
+		searchBar.isHidden.toggle()
+
+		searchTableView.isHidden = true
+		if hourlyForecastCollectionView.isHidden && dailyForecastCollectionView.isHidden {
+			hourlyForecastCollectionView.isHidden.toggle()
+			dailyForecastCollectionView.isHidden.toggle()
 		}
+		print("didSelectRow")
+		interactor?.fetchWeather(for: city.name)
+	}
+}
+
+//MARK: - UISearchBarDelegate
+extension MainScreenViewController: UISearchBarDelegate {
+	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+		guard !searchText.isEmpty else {
+			searchResults = []
+			searchTableView.isHidden = true
+			return
+		}
+		interactor?.searchCities(query: searchText)
+	}
+
+	func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+		if !searchResults.isEmpty {
+			searchTableView.isHidden = false
+		}
+	}
+
+	func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+		guard let cityName = searchBar.text else { return }
+		searchTableView.isHidden = true
+		print("textDidendEditing")
+		interactor?.fetchWeather(for: cityName)
 	}
 }
 
@@ -167,7 +297,17 @@ private extension MainScreenViewController {
 	private func setupViews() {
 		view.backgroundColor = .systemBackground
 
-		[iconImageView, cityLabel, tempLabel, conditionLabel, feelsLikeLabel, humidityLabel, windLabel].forEach {
+		[
+			iconImageView,
+			cityLabel,
+			tempLabel,
+			conditionLabel,
+			feelsLikeLabel,
+			humidityLabel,
+			windLabel,
+			searchBar,
+			searchTableView
+		].forEach {
 			$0.translatesAutoresizingMaskIntoConstraints = false
 			view.addSubview($0)
 		}
@@ -195,15 +335,17 @@ private extension MainScreenViewController {
 
 		dailyForecastCollectionView.translatesAutoresizingMaskIntoConstraints = false
 		view.addSubview(dailyForecastCollectionView)
+
+		searchBar.isHidden = true
 	}
 
 	func makeGradient() {
 		let gradientLayer = CAGradientLayer()
 		gradientLayer.frame = view.bounds
-		gradientLayer.colors = [UIColor.black.cgColor, UIColor(red: 0.5, green: 0.2, blue: 0.5, alpha: 1).cgColor] // черный и сиреневый
-		gradientLayer.locations = [0, 1] // 0 - черный, 1 - сиреневый
-		gradientLayer.startPoint = CGPoint(x: 0, y: 0) // начало градиента (верх)
-		gradientLayer.endPoint = CGPoint(x: 0, y: 1) // конец градиента (низ)
+		gradientLayer.colors = [UIColor.black.cgColor, UIColor(red: 0.5, green: 0.2, blue: 0.5, alpha: 1).cgColor]
+		gradientLayer.locations = [0, 1]
+		gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+		gradientLayer.endPoint = CGPoint(x: 0, y: 1)
 
 		view.layer.insertSublayer(gradientLayer, at: 0)
 	}
@@ -211,7 +353,7 @@ private extension MainScreenViewController {
 
 //MARK: - Layout
 private extension MainScreenViewController {
-	 func setupConstraints() {
+	func setupConstraints() {
 		NSLayoutConstraint.activate(
 			[
 				cityLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
@@ -243,7 +385,16 @@ private extension MainScreenViewController {
 				dailyForecastCollectionView.topAnchor.constraint(equalTo: hourlyForecastCollectionView.bottomAnchor, constant: 16),
 				dailyForecastCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
 				dailyForecastCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
-				dailyForecastCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
+				dailyForecastCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+
+				searchBar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8),
+				searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+				searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+
+				searchTableView.bottomAnchor.constraint(equalTo: searchBar.topAnchor, constant: -8),
+				searchTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+				searchTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+				searchTableView.heightAnchor.constraint(equalToConstant: 200)
 			])
 	}
 }
