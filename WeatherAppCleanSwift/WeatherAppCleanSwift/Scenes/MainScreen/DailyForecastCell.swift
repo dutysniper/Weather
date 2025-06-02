@@ -8,13 +8,13 @@
 import UIKit
 
 final class DailyForecastCell: UICollectionViewCell {
+	static let identifier = "DailyForecastCell"
+
 	let separator: UIView = {
 		let view = UIView()
 		view.backgroundColor = .white.withAlphaComponent(0.2)
 		return view
 	}()
-
-	static let identifier = "DailyForecastCell"
 
 	private let dayLabel: UILabel = {
 		let label = UILabel()

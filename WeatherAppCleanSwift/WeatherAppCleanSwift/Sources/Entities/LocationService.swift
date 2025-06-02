@@ -12,6 +12,7 @@ protocol ILocationService {
 	var authorizationStatus: CLAuthorizationStatus { get }
 }
 
+/// Class for fetching Geolocation
 final class LocationService: NSObject, ILocationService, CLLocationManagerDelegate {
 	private let locationManager = CLLocationManager()
 	private var locationCompletion: ((Result<CLLocationCoordinate2D, Error>) -> Void)?
@@ -55,7 +56,6 @@ final class LocationService: NSObject, ILocationService, CLLocationManagerDelega
 		case .authorizedWhenInUse, .authorizedAlways:
 			manager.requestLocation()
 		case .denied, .restricted:
-			// Если доступ запретили - вызываем completion с ошибкой
 			locationCompletion?(.failure(LocationError.unauthorized))
 			locationCompletion = nil
 		default:

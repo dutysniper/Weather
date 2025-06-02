@@ -26,16 +26,10 @@ struct ForecastDay: Codable {
 }
 
 struct DayForecast: Codable {
-//	let maxtemp_c: Double
-//	let mintemp_c: Double
 	let avgtemp_c: Double
 	let maxwind_kph: Double
 	let avghumidity: Double
 	let condition: WeatherCondition
-
-	enum CodingKeys: String, CodingKey {
-		case avgtemp_c, maxwind_kph, avghumidity, condition
-	}
 }
 
 struct HourlyForecast: Codable {
