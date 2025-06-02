@@ -44,7 +44,7 @@
 - Создайте ветку для вашей фичи (git checkout -b feature/amazing-feature)
 - Сделайте коммит изменений (git commit -m 'Add some amazing feature')
 - Запушьте в ветку (git push origin feature/amazing-feature)
-Откройте Pull Request
+- Откройте Pull Request
 
 
 
