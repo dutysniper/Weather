@@ -1,7 +1,5 @@
 # WeatherApp
 
-<img src="https://github.com/yourusername/WeatherApp/blob/main/Assets/app_icon.png?raw=true" width="150" align="right">
-
 Приложение для просмотра текущей погоды и прогноза на 5 дней с использованием API weatherapi.com. Показывает погоду по текущему местоположению или для выбранного города.
 
 [![Swift Version](https://img.shields.io/badge/Swift-5.7-orange.svg)](https://swift.org)
