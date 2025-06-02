@@ -7,7 +7,6 @@
 
 import UIKit
 
-
 protocol IMainScreenViewController: AnyObject {
 	func displayWeather(viewModel: Weather.Fetch.ViewModel)
 	func displayError(viewModel: Weather.Error.ViewModel)
@@ -42,7 +41,7 @@ final class MainScreenViewController: UIViewController {
 			textField.textColor = .white
 			textField.backgroundColor = UIColor.white.withAlphaComponent(0.2)
 			textField.attributedPlaceholder = NSAttributedString(
-				string: "Поиск города",
+				string: "Введи город и выбери из списка",
 				attributes: [.foregroundColor: UIColor.lightText]
 			)
 		}
@@ -111,6 +110,11 @@ final class MainScreenViewController: UIViewController {
 		fatalError("init(coder:) has not been implemented")
 	}
 
+	deinit {
+		NotificationCenter.default.removeObserver(self)
+	}
+
+
 	// MARK: - Lifecycle
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -118,9 +122,49 @@ final class MainScreenViewController: UIViewController {
 		setupViews()
 		setupConstraints()
 		fetchWeather()
+		setupNotifications()
+		setupTapGestureRecognizer()
+	}
+
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		interactor?.startAutoRefresh()
+	}
+
+	override func viewWillDisappear(_ animated: Bool) {
+		super.viewWillDisappear(animated)
+		interactor?.stopAutoRefresh()
 	}
 
 	private func fetchWeather() {
+		interactor?.fetchWeather()
+	}
+
+	private func setupNotifications() {
+		NotificationCenter.default.addObserver(
+			self,
+			selector: #selector(appDidBecomeActive),
+			name: UIApplication.didBecomeActiveNotification,
+			object: nil
+		)
+	}
+
+	private func setupTapGestureRecognizer() {
+		let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+		tapGesture.cancelsTouchesInView = false 
+		view.addGestureRecognizer(tapGesture)
+	}
+
+	@objc private func handleTap(_ gesture: UITapGestureRecognizer) {
+		let location = gesture.location(in: view)
+		let searchTableViewLocation = gesture.location(in: searchTableView)
+		if !searchBar.frame.contains(location) && !searchTableView.frame.contains(location) {
+			searchBar.resignFirstResponder()
+			searchTableView.isHidden = true
+		}
+	}
+
+	@objc private func appDidBecomeActive() {
 		interactor?.fetchWeather()
 	}
 }
@@ -145,7 +189,7 @@ extension MainScreenViewController: IMainScreenViewController {
 	}
 
 	func displaySearchOnlyState() {
-		cityLabel.text = "Поиск города"
+		cityLabel.text = "Введите город на английском языке"
 		tempLabel.text = ""
 		conditionLabel.text = ""
 		feelsLikeLabel.text = ""
@@ -262,7 +306,6 @@ extension MainScreenViewController: UITableViewDataSource, UITableViewDelegate {
 			hourlyForecastCollectionView.isHidden.toggle()
 			dailyForecastCollectionView.isHidden.toggle()
 		}
-		print("didSelectRow")
 		interactor?.fetchWeather(for: city.name)
 	}
 }
@@ -287,8 +330,16 @@ extension MainScreenViewController: UISearchBarDelegate {
 	func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
 		guard let cityName = searchBar.text else { return }
 		searchTableView.isHidden = true
-		print("textDidendEditing")
-		interactor?.fetchWeather(for: cityName)
+	}
+
+	func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+		guard let query = searchBar.text, !query.isEmpty else { return }
+		searchBar.resignFirstResponder()
+		hourlyForecastCollectionView.isHidden.toggle()
+		dailyForecastCollectionView.isHidden.toggle()
+		searchBar.isHidden.toggle()
+
+		interactor?.fetchWeather(for: query)
 	}
 }
 
@@ -316,7 +367,7 @@ private extension MainScreenViewController {
 		cityLabel.font = .systemFont(ofSize: 24, weight: .medium)
 		cityLabel.textAlignment = .center
 		cityLabel.textColor = .white
-		cityLabel.numberOfLines = 2
+		cityLabel.numberOfLines = 4
 		cityLabel.lineBreakMode = .byWordWrapping
 		cityLabel.adjustsFontSizeToFitWidth = true
 		cityLabel.minimumScaleFactor = 0.7
@@ -391,7 +442,10 @@ private extension MainScreenViewController {
 				searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
 				searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
 
-				searchTableView.bottomAnchor.constraint(equalTo: searchBar.topAnchor, constant: -8),
+				searchTableView.bottomAnchor.constraint(
+					equalTo: view.keyboardLayoutGuide.topAnchor,
+					constant: -8
+				),
 				searchTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
 				searchTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
 				searchTableView.heightAnchor.constraint(equalToConstant: 200)

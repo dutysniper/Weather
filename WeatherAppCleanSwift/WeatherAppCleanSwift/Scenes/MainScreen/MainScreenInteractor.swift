@@ -11,6 +11,8 @@ protocol IMainScreenInteractor {
 	func fetchWeather()
 	func fetchWeather(for city: String)
 	func searchCities(query: String)
+	func startAutoRefresh()
+	func stopAutoRefresh()
 }
 
 final class MainScreenInteractor: IMainScreenInteractor {
@@ -18,6 +20,12 @@ final class MainScreenInteractor: IMainScreenInteractor {
 
 	private var networkManager: INetworkManager
 	private var locationService: ILocationService
+
+
+	private var refreshTimer: Timer?
+	private let refreshInterval: TimeInterval = 1800
+	private var lastUpdateTime: Date?
+	private let minUpdateInterval: TimeInterval = 900
 
 	init(
 		presenter: IMainScreenPresenter,
@@ -29,8 +37,38 @@ final class MainScreenInteractor: IMainScreenInteractor {
 		self.locationService = locationService
 	}
 
+	deinit {
+		stopAutoRefresh()
+	}
+
 	func fetchWeather() {
+		if let lastUpdate = lastUpdateTime,
+		   Date().timeIntervalSince(lastUpdate) < minUpdateInterval {
+			return
+		}
 		checkLocationAuthorization()
+		lastUpdateTime = Date()
+	}
+
+	func startAutoRefresh() {
+		// Останавливаем предыдущий таймер, если был
+		stopAutoRefresh()
+
+		// Сразу делаем первый запрос
+		fetchWeather()
+
+		// Настраиваем периодическое обновление
+		refreshTimer = Timer.scheduledTimer(
+			withTimeInterval: refreshInterval,
+			repeats: true
+		) { [weak self] _ in
+			self?.fetchWeather()
+		}
+	}
+
+	func stopAutoRefresh() {
+		refreshTimer?.invalidate()
+		refreshTimer = nil
 	}
 
 	private func checkLocationAuthorization() {
