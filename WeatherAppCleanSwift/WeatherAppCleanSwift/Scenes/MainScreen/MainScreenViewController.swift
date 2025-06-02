@@ -151,7 +151,7 @@ final class MainScreenViewController: UIViewController {
 
 	private func setupTapGestureRecognizer() {
 		let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
-		tapGesture.cancelsTouchesInView = false 
+		tapGesture.cancelsTouchesInView = false
 		view.addGestureRecognizer(tapGesture)
 	}
 
@@ -444,7 +444,7 @@ private extension MainScreenViewController {
 
 				searchTableView.bottomAnchor.constraint(
 					equalTo: view.keyboardLayoutGuide.topAnchor,
-					constant: -8
+					constant: -64
 				),
 				searchTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
 				searchTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
