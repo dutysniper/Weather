@@ -19,8 +19,71 @@ protocol IMainScreenPresenter {
 final class MainScreenPresenter: IMainScreenPresenter {
 	private weak var viewController: IMainScreenViewController?
 
+	// MARK: - Initialization
 	init(viewController: IMainScreenViewController?) {
 		self.viewController = viewController
+	}
+
+	// MARK: - Public Methods
+	func presentWeather(response: Weather.Fetch.Response) {
+		let weather = response.weatherData.current
+		let location = response.weatherData.location
+		let hourlyForecast = response.weatherData.forecast?.forecastday.first?.hour ?? []
+		let dailyForecast = response.weatherData.forecast?.forecastday ?? []
+
+		// Получаем отфильтрованный часовой прогноз
+		var filteredHourly = filterHourlyForecast(hourlyForecast, localtime: location.localtime)
+
+		// Если прогноза меньше чем на 24 часа, добавляем из следующего дня
+		if filteredHourly.count < 24, let forecastDays = response.weatherData.forecast?.forecastday, forecastDays.count > 1 {
+			let remainingHours = 24 - filteredHourly.count
+			let nextDayHours = Array(forecastDays[1].hour.prefix(remainingHours))
+			filteredHourly += nextDayHours
+		}
+
+		let viewModel = Weather.Fetch.ViewModel(
+			cityName: "\(location.name), \(location.country)",
+			temperature: "\(Int(weather.tempC))°C",
+			condition: weather.condition.text,
+			feelsLike: "Ощущается как \(Int(weather.feelslikeC))°C",
+			humidity: "Влажность: \(weather.humidity)%",
+			windSpeed: "Ветер: \(weather.windKph) км/ч",
+			iconURL: URL(string: "https:\(weather.condition.icon)"),
+			hourlyForecast: filteredHourly,
+			dailyForecast: Array(dailyForecast.prefix(5))
+		)
+
+		DispatchQueue.main.async { [weak self] in
+			self?.viewController?.displayWeather(viewModel: viewModel)
+		}
+	}
+
+	func presentError(error: Error) {
+		let viewModel = Weather.Error.ViewModel(
+			title: "Error",
+			message: error.localizedDescription
+		)
+		DispatchQueue.main.async { [weak self] in
+			self?.viewController?.displayError(viewModel: viewModel)
+		}
+	}
+
+	func showSearchField() {
+		DispatchQueue.main.async { [weak self] in
+			self?.viewController?.showSearchField()
+		}
+	}
+
+	func hideSearchField() {
+		DispatchQueue.main.async { [weak self] in
+			self?.viewController?.hideSearchField()
+		}
+	}
+
+	func updateSearchResults(cities: [City]) {
+		DispatchQueue.main.async { [weak self] in
+			self?.viewController?.updateSearchResults(cities: cities)
+		}
 	}
 
 	func showSearchOnly() {
@@ -29,54 +92,12 @@ final class MainScreenPresenter: IMainScreenPresenter {
 		}
 	}
 
-	func presentWeather(response: Weather.Fetch.Response) {
-		let weather = response.weatherData.current
-		let location = response.weatherData.location
-		let hourlyForecast = response.weatherData.forecast?.forecastday.first?.hour ?? []
-		let dailyForecast = response.weatherData.forecast?.forecastday ?? []
-
-		let viewModel2 = Weather.Fetch.ViewModel(
-			cityName: "\(location.name), \(location.country)",
-			temperature: "\(Int(weather.tempC))°C",
-			condition: weather.condition.text,
-			feelsLike: "Ощущается как \(Int(weather.feelslikeC))°C",
-			humidity: "Влажность: \(weather.humidity)%",
-			windSpeed: "Ветер: \(weather.windKph) км/ч",
-			iconURL: URL(string: "https:\(weather.condition.icon)"),
-			hourlyForecast: filterHourlyForecast(hourlyForecast, localtime: location.localtime),
-			dailyForecast: Array(dailyForecast.prefix(5)))
-		print(location.localtime)
-		viewController?.displayWeather(viewModel: viewModel2)
-	}
-
-	func presentError(error: Error) {
-		let viewModel = Weather.Error.ViewModel(
-			title: "Error",
-			message: error.localizedDescription
-		)
-		viewController?.displayError(viewModel: viewModel)
-	}
-
-	func showSearchField() {
-		viewController?.showSearchField()
-	}
-
-	func hideSearchField() {
-		viewController?.hideSearchField()
-	}
-
-	func updateSearchResults(cities: [City]) {
-		DispatchQueue.main.async { [weak self] in
-			guard let self = self else { return }
-			self.viewController?.updateSearchResults(cities: cities)
-		}
-	}
-
+	// MARK: - Private Methods
 	private func filterHourlyForecast(_ forecast: [HourlyForecast], localtime: String) -> [HourlyForecast] {
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
 		dateFormatter.timeZone = TimeZone(identifier: "UTC")
-
+		
 		guard let localDate = dateFormatter.date(from: localtime) else {
 			return Array(forecast.prefix(24))
 		}
@@ -88,10 +109,15 @@ final class MainScreenPresenter: IMainScreenPresenter {
 			return Array(forecast.prefix(24))
 		}
 
+		guard let endDate = calendar.date(byAdding: .hour, value: 24, to: startOfHour) else {
+			return Array(forecast.prefix(24))
+		}
+
 		let filtered = forecast.filter { hourly in
 			guard let hourlyDate = dateFormatter.date(from: hourly.time) else { return false }
-			return hourlyDate >= startOfHour
+			return hourlyDate >= startOfHour && hourlyDate < endDate
 		}
-		return Array(filtered.prefix(24))
+
+		return Array(filtered)
 	}
 }

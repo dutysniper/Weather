@@ -33,7 +33,7 @@ final class MainScreenViewController: UIViewController {
 
 	private lazy var searchBar: UISearchBar = {
 		let searchBar = UISearchBar()
-		searchBar.placeholder = "Поиск города"
+		searchBar.placeholder = "Введите населенный пункт"
 		searchBar.delegate = self
 		searchBar.searchBarStyle = .minimal
 		searchBar.barTintColor = .white
